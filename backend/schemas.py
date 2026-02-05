@@ -54,8 +54,11 @@ class ProjectUpdate(BaseModel):
     links: Optional[Dict[str, Any]] = None
 
 
-class ProjectOut(ProjectCreate):
+class ProjectOut(BaseModel):
     id: int
+    title: str
+    description: str
+    links: dict
 
     class Config:
         from_attributes = True

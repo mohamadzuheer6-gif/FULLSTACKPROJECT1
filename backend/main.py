@@ -2,12 +2,8 @@ from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
 from fastapi import Header
-import os
-from dotenv import load_dotenv
 
 from database import SessionLocal, engine
-
-load_dotenv()
 from models import Base, Profile, Skill, Project
 from schemas import *
 from fastapi.middleware.cors import CORSMiddleware
@@ -16,7 +12,7 @@ from fastapi.middleware.cors import CORSMiddleware
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
-ADMIN_API_KEY = os.getenv("ADMIN_API_KEY")
+ADMIN_API_KEY = "admin123"   # simple on purpose (demo)
 def verify_admin(x_api_key: str = Header(None)):
     if x_api_key != ADMIN_API_KEY:
         raise HTTPException(status_code=401, detail="Unauthorized")
@@ -29,14 +25,9 @@ def get_db():
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://127.0.0.1:5173",
-        "http://localhost:5173",
-        "https://fullstackproject1-mbxzxbpr7-mohammad-zuheers-projects.vercel.app",
-        "https://fullstackproject1-mmf5.onrender.com"
-    ],
+    allow_origins=["*"],  # frontend origin
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["*"],  # GET, POST, PATCH, DELETE, OPTIONS
     allow_headers=["*"],
 )
 

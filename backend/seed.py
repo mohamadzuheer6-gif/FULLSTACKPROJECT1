@@ -44,21 +44,28 @@ llm = get_or_create_skill("LLM", "Beginner")
 
 
 # ================= PROJECTS =================
-title = "TRAFFIC-SIGNAL-FORECASTING"
-description = "The Traffic Signal Forecasting System is an AI-powered solution designed to predict and optimize traffic light timings based on real-time and historical traffic data. The goal is to reduce congestion, improve traffic flow, and minimize waiting times at intersections. Using Python and Machine Learning algorithms."
-link = "https://github.com/mohamadzuheer6-gif/TRAFFIC-SIGNAL-FORECAST"
+projects_data = [
+    {
+        "title": "Traffic Signal Forecasting System",
+        "description": " Built a machine learning model to predict traffic congestion using historical signal data Performed data preprocessing and model training in PythonHelps in understanding traffic flow patterns for smarter signal management",
+        "link": "https://github.com/mohamadzuheer6-gif/TRAFFIC-SIGNAL-FORECAST"
+    },
+    {
+        "title": "Medical Chatbot using LLMs",
+        "description": "Developed an AI-based medical chatbot using LLMs for answering health-related queries Implemented backend using Flask and LangChain with vector database integration Deployed the application on AWS for real-world usage",
+        "link": "https://github.com/mohamadzuheer6-gif/MEDICAL-CHATBOT"
+    }
+]
 
-title = "MEDICAL-CHATBOT-USING-LLM"
-description = "An AI-powered medical chatbot designed to provide 24/7 symptom analysis, triage, and reliable health information, bridging the gap between patients and primary care"
-link = "ttps://github.com/mohamadzuheer6-gif/MEDICAL-CHATBOT"
+for proj_data in projects_data:
+    project = Project(
+        title=proj_data["title"],
+        description=proj_data["description"],
+        links={"link": proj_data["link"]},
+        profile_id=profile.id
+    )
+    db.add(project)
 
-project = Project(
-    title=title,
-    description=description,
-    links={"link": link},
-    profile_id=profile.id
-)
-db.add(project)
 db.commit()
 
 db.close()
