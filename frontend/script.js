@@ -49,7 +49,7 @@ function updateUI() {
     document.querySelectorAll(".edit-box").forEach(box => {
         box.style.display = loggedIn ? "block" : "none";
     });
-  // Logout button
+    
     const logoutBtn = document.getElementById("logoutBtn");
     if (logoutBtn) {
         logoutBtn.style.display = loggedIn ? "inline-block" : "none";
@@ -59,7 +59,6 @@ function updateUI() {
         badge.style.display = loggedIn ? "inline-block" : "none";
     }
 }
-
 
 /* ---------- TOGGLE SECTION ---------- */
 function toggleSection(id) {
@@ -102,17 +101,18 @@ function loadProfile() {
 function saveProfile() {
     fetch(`${API}/profile`, {
         method: "PATCH",
-        headers: {"Content-Type":"application/json",...getAuthHeaders()},
+        headers: {"Content-Type":"application/json", ...getAuthHeaders()},
         body: JSON.stringify({
             name: pName.value,
-    .catch(err => {
-        console.error("Error saving profile:", err);
-        alert("Error saving profile: " + err.message);
-    })
             email: pEmail.value,
             education: pEdu.value
         })
-    }).then(() => loadProfile());
+    })
+    .then(() => loadProfile())
+    .catch(err => {
+        console.error("Error saving profile:", err);
+        alert("Error saving profile: " + err.message);
+    });
 }
 
 /* ---------- SKILLS ---------- */
@@ -134,14 +134,14 @@ function loadSkills() {
                         <span class="badge ${s.proficiency.toLowerCase()}">
                             ${s.proficiency}
                         </span>
-          
-        .catch(err => {
-            console.error("Error loading skills:", err);
-            alert("Error loading skills: " + err.message);
-        })              <button onclick="deleteSkill(${s.id})">❌</button>
+                        <button onclick="deleteSkill(${s.id})">❌</button>
                     </li>
                 `;
             });
+        })
+        .catch(err => {
+            console.error("Error loading skills:", err);
+            alert("Error loading skills: " + err.message);
         });
 }
 
@@ -162,26 +162,27 @@ function addSkill() {
             proficiency: skillProf.value
         })
     })
-    .catch(err => {
-        console.error("Error adding skill:", err);
-        alert("Error adding skill: " + err.message);
-    }).then(() => {
+    .then(() => {
         skillName.value = "";
         skillProf.value = "";
         loadSkills();
+    })
+    .catch(err => {
+        console.error("Error adding skill:", err);
+        alert("Error adding skill: " + err.message);
     });
 }
 
-
 function deleteSkill(id) {
-    .catch(err => {
-        console.error("Error deleting skill:", err);
-        alert("Error deleting skill: " + err.message);
-    })
     fetch(`${API}/skills/${id}`, {
         method: "DELETE",
         headers: { ...getAuthHeaders() }
-    }).then(() => loadSkills());
+    })
+    .then(() => loadSkills())
+    .catch(err => {
+        console.error("Error deleting skill:", err);
+        alert("Error deleting skill: " + err.message);
+    });
 }
 
 /* ---------- PROJECTS ---------- */
@@ -214,28 +215,43 @@ function loadProjects() {
 }
 
 function addProject() {
+    if (!projTitle.value || !projDesc.value || !projLink.value) {
+        alert("Please fill in all project fields");
+        return;
+    }
+
     fetch(`${API}/projects`, {
         method: "POST",
         headers: {"Content-Type":"application/json", ...getAuthHeaders()},
         body: JSON.stringify({
-            title: projTitle.valu
-    .catch(err => {
-        console.error("Error adding project:", err);
-        alert("Error adding project: " + err.message);
-    })e,
+            title: projTitle.value,
             description: projDesc.value,
             links: { link: projLink.value }
         })
-    }).then(() => loadProjects());
+    })
+    .then(() => {
+        projTitle.value = "";
+        projDesc.value = "";
+        projLink.value = "";
+        loadProjects();
+    })
+    .catch(err => {
+        console.error("Error adding project:", err);
+        alert("Error adding project: " + err.message);
+    });
 }
-        .catch(err => {
-            console.error("Error deleting project:", err);
-            alert("Error deleting project: " + err.message);
-        })
 
 function deleteProject(id) {
-    fetch(`${API}/projects/${id}`, { method: "DELETE",headers:{...getAuthHeaders()} })
-        .then(() => loadProjects());
+    fetch(`${API}/projects/${id}`, {
+        method: "DELETE",
+        headers: {...getAuthHeaders()}
+    })
+    .then(() => loadProjects())
+    .catch(err => {
+        console.error("Error deleting project:", err);
+        alert("Error deleting project: " + err.message);
+    });
 }
+
 updateUI();
 
