@@ -27,16 +27,15 @@ def get_db():
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
+        "https://fullstackproject1-mmf5.vercel.app",
+        "https://vercel.com",  # IMPORTANT (your error shows origin = vercel.com)
         "http://localhost:5500",
         "http://127.0.0.1:5500",
-        "https://fullstackproject1-mmf5.onrender.com",  # backend (optional)
-        "https://fullstackproject1-mmf5.vercel.app",    # frontend (CHANGE if different)
     ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
 
 @app.get("/health")
 def health():
