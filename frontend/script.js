@@ -1,4 +1,6 @@
-const API = "http://127.0.0.1:8000";
+const API = window.location.hostname.includes("localhost")
+    ? "http://127.0.0.1:8000"
+    : "https://fullstackproject1-mmf5.onrender.com";
 
 const ADMIN_KEY = "admin123";
 
