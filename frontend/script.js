@@ -197,6 +197,14 @@ function loadProjects() {
     const projectsSection = document.getElementById("projects");
     projectsSection.style.display = "block";
 
+    // If not logged in, show hardcoded projects for viewers
+    const isAdmin = sessionStorage.getItem("auth");
+    if (!isAdmin) {
+        displayHardcodedProjects();
+        return;
+    }
+
+    // If logged in, fetch from API
     fetch(`${API}/projects`)
         .then(r => r.json())
         .then(data => {
@@ -216,6 +224,21 @@ function loadProjects() {
             console.error("Error loading projects:", err);
             alert("Error loading projects: " + err.message);
         });
+}
+
+function displayHardcodedProjects() {
+    projects.innerHTML = `
+        <div class="project">
+            <h3>TRAFFIC-SIGNAL-FORECASTING</h3>
+            <p>The Traffic Signal Forecasting System is an AI-powered solution designed to predict and optimize traffic light timings based on real-time and historical traffic data. The goal is to reduce congestion, improve traffic flow, and minimize waiting times at intersections. Using Python and Machine Learning algorithms.</p>
+            <a href="https://github.com/mohamadzuheer6-gif/TRAFFIC-SIGNAL-FORECAST" target="_blank">Open</a>
+        </div>
+        <div class="project">
+            <h3>MEDICAL-CHATBOT-USING-LLM</h3>
+            <p>An AI-powered medical chatbot designed to provide 24/7 symptom analysis, triage, and reliable health information, bridging the gap between patients and primary care.</p>
+            <a href="https://github.com/mohamadzuheer6-gif/MEDICAL-CHATBOT" target="_blank">Open</a>
+        </div>
+    `;
 }
 
 function addProject() {
