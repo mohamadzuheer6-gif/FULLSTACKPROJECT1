@@ -92,22 +92,34 @@ function toggleProfile() {
 
 function loadProfile() {
     fetch(`${API}/profile`)
-        .then(r => r.json())
+        .then(r => {
+            if (!r.ok) {
+                throw new Error("Profile API failed");
+            }
+            return r.json();
+        })
         .then(p => {
+            // p is a plain object (confirmed)
             profileView.innerHTML = `
-                <p><b>Name:</b> ${p.name ?? ""}</p>
-                <p><b>Email:</b> ${p.email ?? ""}</p>
-                <p><b>Education:</b> ${p.education ?? ""}</p>
+                <p><b>Name:</b> ${p.name}</p>
+                <p><b>Email:</b> ${p.email}</p>
+                <p><b>Education:</b> ${p.education}</p>
             `;
+
             pName.value = p.name || "";
             pEmail.value = p.email || "";
             pEdu.value = p.education || "";
         })
         .catch(err => {
-            profileView.innerHTML = "<p>Failed to load profile</p>";
-            console.error(err);
+            profileView.innerHTML = `
+                <p style="color:red">
+                    Failed to load profile
+                </p>
+            `;
+            console.error("Profile load error:", err);
         });
 }
+
 
 function saveProfile() {
     fetch(`${API}/profile`, {
