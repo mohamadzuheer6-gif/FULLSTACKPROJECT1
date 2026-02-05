@@ -34,6 +34,11 @@ document.addEventListener("DOMContentLoaded", () => {
     projDesc = document.getElementById("projDesc");
     projLink = document.getElementById("projLink");
 
+    // 🔥 ensure sections start hidden but toggleable
+    [profileView, skills, projects].forEach(el => {
+        if (el) el.style.display = "none";
+    });
+
     updateUI();
 });
 
@@ -69,18 +74,14 @@ function updateUI() {
     if (badge) badge.style.display = loggedIn ? "inline-block" : "none";
 }
 
-/* ================= TOGGLE ================= */
+/* ================= TOGGLE (FIXED) ================= */
 function toggleSection(id) {
     const el = document.getElementById(id);
     if (!el) return false;
 
-    if (el.style.display === "none" || el.style.display === "") {
-        el.style.display = "block";
-        return true;
-    } else {
-        el.style.display = "none";
-        return false;
-    }
+    const isHidden = getComputedStyle(el).display === "none";
+    el.style.display = isHidden ? "block" : "none";
+    return isHidden;
 }
 
 /* ================= PROFILE ================= */
@@ -94,13 +95,17 @@ function loadProfile() {
         .then(r => r.json())
         .then(p => {
             profileView.innerHTML = `
-                <p><b>Name:</b> ${p.name}</p>
-                <p><b>Email:</b> ${p.email}</p>
-                <p><b>Education:</b> ${p.education}</p>
+                <p><b>Name:</b> ${p.name ?? ""}</p>
+                <p><b>Email:</b> ${p.email ?? ""}</p>
+                <p><b>Education:</b> ${p.education ?? ""}</p>
             `;
             pName.value = p.name || "";
             pEmail.value = p.email || "";
             pEdu.value = p.education || "";
+        })
+        .catch(err => {
+            profileView.innerHTML = "<p>Failed to load profile</p>";
+            console.error(err);
         });
 }
 
@@ -130,6 +135,8 @@ function loadSkills() {
         .then(r => r.json())
         .then(data => {
             skills.innerHTML = "";
+            if (!Array.isArray(data)) return;
+
             data.forEach(s => {
                 skills.innerHTML += `
                     <li>
@@ -141,6 +148,10 @@ function loadSkills() {
                     </li>
                 `;
             });
+        })
+        .catch(err => {
+            skills.innerHTML = "<li>Failed to load skills</li>";
+            console.error(err);
         });
 }
 
@@ -201,6 +212,10 @@ function loadProjects() {
                     </div>
                 `;
             });
+        })
+        .catch(err => {
+            projects.innerHTML = "<p>Failed to load projects</p>";
+            console.error(err);
         });
 }
 
