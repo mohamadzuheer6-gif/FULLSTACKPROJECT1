@@ -139,3 +139,11 @@ button:hover {
     border: 1px solid #ccc;
     margin-left: 8px;
 }
+
+.project-card {
+    background: white;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 14px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}

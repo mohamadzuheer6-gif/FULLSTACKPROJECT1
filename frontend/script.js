@@ -1,7 +1,14 @@
-// API URL is loaded from config.js
-const API = window.API;
-const ADMIN_KEY = "zuheer123";
+const API = "http://127.0.0.1:8000";
 
+const ADMIN_KEY = "admin123";
+
+function getAuthHeaders() {
+    const key = sessionStorage.getItem("auth");
+    if (!key) return {};
+    return {
+        "X-API-Key": key
+    };
+}
 function getAuthHeaders() {
     const key = sessionStorage.getItem("auth");
     if (!key) return {};
@@ -49,7 +56,7 @@ function updateUI() {
     document.querySelectorAll(".edit-box").forEach(box => {
         box.style.display = loggedIn ? "block" : "none";
     });
-    
+  // Logout button
     const logoutBtn = document.getElementById("logoutBtn");
     if (logoutBtn) {
         logoutBtn.style.display = loggedIn ? "inline-block" : "none";
@@ -59,6 +66,7 @@ function updateUI() {
         badge.style.display = loggedIn ? "inline-block" : "none";
     }
 }
+
 
 /* ---------- TOGGLE SECTION ---------- */
 function toggleSection(id) {
@@ -91,28 +99,19 @@ function loadProfile() {
             pName.value = p.name || "";
             pEmail.value = p.email || "";
             pEdu.value = p.education || "";
-        })
-        .catch(err => {
-            console.error("Error loading profile:", err);
-            alert("Error loading profile: " + err.message);
         });
 }
 
 function saveProfile() {
     fetch(`${API}/profile`, {
         method: "PATCH",
-        headers: {"Content-Type":"application/json", ...getAuthHeaders()},
+        headers: {"Content-Type":"application/json",...getAuthHeaders()},
         body: JSON.stringify({
             name: pName.value,
             email: pEmail.value,
             education: pEdu.value
         })
-    })
-    .then(() => loadProfile())
-    .catch(err => {
-        console.error("Error saving profile:", err);
-        alert("Error saving profile: " + err.message);
-    });
+    }).then(() => loadProfile());
 }
 
 /* ---------- SKILLS ---------- */
@@ -121,9 +120,7 @@ function toggleloadSkills() {
 }
 
 function loadSkills() {
-    // Ensure section is visible
-    const skillsSection = document.getElementById("skills");
-    skillsSection.style.display = "block";
+    if (!toggleSection("skills")) return;
 
     fetch(`${API}/skills`)
         .then(r => r.json())
@@ -140,10 +137,6 @@ function loadSkills() {
                     </li>
                 `;
             });
-        })
-        .catch(err => {
-            console.error("Error loading skills:", err);
-            alert("Error loading skills: " + err.message);
         });
 }
 
@@ -163,97 +156,73 @@ function addSkill() {
             name: skillName.value,
             proficiency: skillProf.value
         })
-    })
-    .then(() => {
+    }).then(() => {
         skillName.value = "";
         skillProf.value = "";
         loadSkills();
-    })
-    .catch(err => {
-        console.error("Error adding skill:", err);
-        alert("Error adding skill: " + err.message);
     });
 }
+
 
 function deleteSkill(id) {
     fetch(`${API}/skills/${id}`, {
         method: "DELETE",
         headers: { ...getAuthHeaders() }
-    })
-    .then(() => loadSkills())
-    .catch(err => {
-        console.error("Error deleting skill:", err);
-        alert("Error deleting skill: " + err.message);
-    });
+    }).then(() => loadSkills());
 }
 
 /* ---------- PROJECTS ---------- */
+/* ---------- PROJECTS ---------- */
+
 function toggleloadProjects() {
+    // toggle FIRST, load ONLY when opened
+    if (!toggleSection("projects")) return;
     loadProjects();
 }
 
 function loadProjects() {
-    // Ensure section is visible
-    const projectsSection = document.getElementById("projects");
-    projectsSection.style.display = "block";
-
-    // If not logged in, show hardcoded projects for viewers
-    const isAdmin = sessionStorage.getItem("auth");
-    if (!isAdmin) {
-        displayHardcodedProjects();
-        return;
-    }
-
-    // If logged in, fetch from API
     fetch(`${API}/projects`)
         .then(r => r.json())
         .then(data => {
             projects.innerHTML = "";
+
+            // SAFETY: ensure array
+            if (!Array.isArray(data)) {
+                console.error("Projects API did not return array", data);
+                return;
+            }
+
             data.forEach(p => {
                 projects.innerHTML += `
                     <div class="project">
                         <h3>${p.title}</h3>
                         <p>${p.description}</p>
-                        <a href="${p.links?.link || "#"}" target="_blank">Open</a><br>
+
+                        ${
+                            p.links && p.links.link
+                            ? `<a href="${p.links.link}" target="_blank">🔗 Open</a><br>`
+                            : ""
+                        }
+
                         <button onclick="deleteProject(${p.id})">Delete</button>
                     </div>
                 `;
             });
         })
-        .catch(err => {
-            console.error("Error loading projects:", err);
-            alert("Error loading projects: " + err.message);
-        });
-}
-
-function displayHardcodedProjects() {
-    projects.innerHTML = `
-        <div class="project">
-            <h3>TRAFFIC-SIGNAL-FORECASTING</h3>
-            <p>The Traffic Signal Forecasting System is an AI-powered solution designed to predict and optimize traffic light timings based on real-time and historical traffic data. The goal is to reduce congestion, improve traffic flow, and minimize waiting times at intersections. Using Python and Machine Learning algorithms.</p>
-            <a href="https://github.com/mohamadzuheer6-gif/TRAFFIC-SIGNAL-FORECAST" target="_blank">Open</a>
-        </div>
-        <div class="project">
-            <h3>MEDICAL-CHATBOT-USING-LLM</h3>
-            <p>An AI-powered medical chatbot designed to provide 24/7 symptom analysis, triage, and reliable health information, bridging the gap between patients and primary care.</p>
-            <a href="https://github.com/mohamadzuheer6-gif/MEDICAL-CHATBOT" target="_blank">Open</a>
-        </div>
-    `;
+        .catch(err => console.error("Load projects failed", err));
 }
 
 function addProject() {
-    if (!projTitle.value || !projDesc.value || !projLink.value) {
-        alert("Please fill in all project fields");
-        return;
-    }
-
     fetch(`${API}/projects`, {
         method: "POST",
-        headers: {"Content-Type":"application/json", ...getAuthHeaders()},
+        headers: {
+            "Content-Type": "application/json",
+            ...getAuthHeaders()
+        },
         body: JSON.stringify({
-            title: projTitle.value,
-            description: projDesc.value,
-            links: { link: projLink.value }
+            title: projTitle.value.trim(),
+            description: projDesc.value.trim(),
+            links: { link: projLink.value.trim() }
         })
     })
     .then(() => {
@@ -261,24 +230,15 @@ function addProject() {
         projDesc.value = "";
         projLink.value = "";
         loadProjects();
-    })
-    .catch(err => {
-        console.error("Error adding project:", err);
-        alert("Error adding project: " + err.message);
     });
 }
 
 function deleteProject(id) {
     fetch(`${API}/projects/${id}`, {
         method: "DELETE",
-        headers: {...getAuthHeaders()}
+        headers: { ...getAuthHeaders() }
     })
-    .then(() => loadProjects())
-    .catch(err => {
-        console.error("Error deleting project:", err);
-        alert("Error deleting project: " + err.message);
-    });
+    .then(() => loadProjects());
 }
-
 updateUI();
 
