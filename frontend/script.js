@@ -1,14 +1,7 @@
-const API = "http://127.0.0.1:8000";
+// API URL is loaded from config.js
+const API = window.API;
+const ADMIN_KEY = "zuheer123";
 
-const ADMIN_KEY = "admin123";
-
-function getAuthHeaders() {
-    const key = sessionStorage.getItem("auth");
-    if (!key) return {};
-    return {
-        "X-API-Key": key
-    };
-}
 function getAuthHeaders() {
     const key = sessionStorage.getItem("auth");
     if (!key) return {};
@@ -99,6 +92,10 @@ function loadProfile() {
             pName.value = p.name || "";
             pEmail.value = p.email || "";
             pEdu.value = p.education || "";
+        })
+        .catch(err => {
+            console.error("Error loading profile:", err);
+            alert("Error loading profile: " + err.message);
         });
 }
 
@@ -108,6 +105,10 @@ function saveProfile() {
         headers: {"Content-Type":"application/json",...getAuthHeaders()},
         body: JSON.stringify({
             name: pName.value,
+    .catch(err => {
+        console.error("Error saving profile:", err);
+        alert("Error saving profile: " + err.message);
+    })
             email: pEmail.value,
             education: pEdu.value
         })
@@ -133,7 +134,11 @@ function loadSkills() {
                         <span class="badge ${s.proficiency.toLowerCase()}">
                             ${s.proficiency}
                         </span>
-                        <button onclick="deleteSkill(${s.id})">❌</button>
+          
+        .catch(err => {
+            console.error("Error loading skills:", err);
+            alert("Error loading skills: " + err.message);
+        })              <button onclick="deleteSkill(${s.id})">❌</button>
                     </li>
                 `;
             });
@@ -156,6 +161,10 @@ function addSkill() {
             name: skillName.value,
             proficiency: skillProf.value
         })
+    })
+    .catch(err => {
+        console.error("Error adding skill:", err);
+        alert("Error adding skill: " + err.message);
     }).then(() => {
         skillName.value = "";
         skillProf.value = "";
@@ -165,6 +174,10 @@ function addSkill() {
 
 
 function deleteSkill(id) {
+    .catch(err => {
+        console.error("Error deleting skill:", err);
+        alert("Error deleting skill: " + err.message);
+    })
     fetch(`${API}/skills/${id}`, {
         method: "DELETE",
         headers: { ...getAuthHeaders() }
@@ -193,6 +206,10 @@ function loadProjects() {
                     </div>
                 `;
             });
+        })
+        .catch(err => {
+            console.error("Error loading projects:", err);
+            alert("Error loading projects: " + err.message);
         });
 }
 
@@ -201,12 +218,20 @@ function addProject() {
         method: "POST",
         headers: {"Content-Type":"application/json", ...getAuthHeaders()},
         body: JSON.stringify({
-            title: projTitle.value,
+            title: projTitle.valu
+    .catch(err => {
+        console.error("Error adding project:", err);
+        alert("Error adding project: " + err.message);
+    })e,
             description: projDesc.value,
             links: { link: projLink.value }
         })
     }).then(() => loadProjects());
 }
+        .catch(err => {
+            console.error("Error deleting project:", err);
+            alert("Error deleting project: " + err.message);
+        })
 
 function deleteProject(id) {
     fetch(`${API}/projects/${id}`, { method: "DELETE",headers:{...getAuthHeaders()} })

@@ -29,9 +29,14 @@ def get_db():
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # frontend origin
+    allow_origins=[
+        "http://127.0.0.1:5173",
+        "http://localhost:5173",
+        "https://fullstackproject1-mbxzxbpr7-mohammad-zuheers-projects.vercel.app",
+        "https://fullstackproject1-mmf5.onrender.com"
+    ],
     allow_credentials=True,
-    allow_methods=["*"],  # GET, POST, PATCH, DELETE, OPTIONS
+    allow_methods=["*"],
     allow_headers=["*"],
 )
 
