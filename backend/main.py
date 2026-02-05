@@ -1,34 +1,20 @@
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, Depends, HTTPException, Header
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from typing import List
-from fastapi import Header
 
 from database import SessionLocal, engine
 from models import Base, Profile, Skill, Project
 from schemas import *
-from fastapi.middleware.cors import CORSMiddleware
-
-
-Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
-ADMIN_API_KEY = "admin123"   # simple on purpose (demo)
-def verify_admin(x_api_key: str = Header(None)):
-    if x_api_key != ADMIN_API_KEY:
-        raise HTTPException(status_code=401, detail="Unauthorized")
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
-
+# ✅ CORS MUST BE IMMEDIATELY AFTER app creation
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
+        "https://vercel.com",
         "https://fullstackproject1-mmf5.vercel.app",
-        "https://vercel.com",  # IMPORTANT (your error shows origin = vercel.com)
         "http://localhost:5500",
         "http://127.0.0.1:5500",
     ],
@@ -36,6 +22,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 @app.get("/health")
 def health():
