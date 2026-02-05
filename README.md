@@ -1,13 +1,19 @@
 # Track-A Portfolio Application 🚀
 
 This is a full-stack Portfolio Management Application. The application allows users to view profile information, skills, and projects, while authenticated users (admin) can create, update, and delete data.
-To login as admis use login username: zuheer123
+To login as admin use the key: `zuheer123`
+
 ---
 
-## 🔗 Live Application
+## 🔗 Live Application & Links
 
-Frontend URL: https://your-frontend-url.netlify.app  
-Backend API URL: https://your-backend-url.onrender.com  
+**Frontend URL:** https://fullstackproject1-mbxzxbpr7-mohammad-zuheers-projects.vercel.app/
+
+**GitHub Repository:** https://github.com/mohamadzuheer6-gif/FULLSTACKPROJECT1
+
+**Backend API URL:** https://fullstackproject1-mmf5.onrender.com/
+
+**Resume:** https://drive.google.com/file/d/19mkL637yT-q_ejYzuHCTqrcIoyWc4LZp/view?usp=sharing
 
 ---
 
