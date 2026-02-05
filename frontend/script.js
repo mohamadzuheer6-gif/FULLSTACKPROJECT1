@@ -121,7 +121,9 @@ function toggleloadSkills() {
 }
 
 function loadSkills() {
-    if (!toggleSection("skills")) return;
+    // Ensure section is visible
+    const skillsSection = document.getElementById("skills");
+    skillsSection.style.display = "block";
 
     fetch(`${API}/skills`)
         .then(r => r.json())
@@ -191,7 +193,9 @@ function toggleloadProjects() {
 }
 
 function loadProjects() {
-    if (!toggleSection("projects")) return;
+    // Ensure section is visible
+    const projectsSection = document.getElementById("projects");
+    projectsSection.style.display = "block";
 
     fetch(`${API}/projects`)
         .then(r => r.json())
