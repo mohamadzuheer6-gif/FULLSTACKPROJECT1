@@ -8,6 +8,18 @@ from models import Base, Profile, Skill, Project
 from schemas import *
 
 app = FastAPI()
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+        
+ADMIN_API_KEY="admin123"
+def verify_admin(x_api_key: str = Header(None)):
+    if x_api_key != ADMIN_API_KEY:
+        raise HTTPException(status_code=401, detail="Unauthorized")
+
 
 # ✅ CORS MUST BE IMMEDIATELY AFTER app creation
 app.add_middleware(
