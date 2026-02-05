@@ -2,8 +2,12 @@ from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
 from fastapi import Header
+import os
+from dotenv import load_dotenv
 
 from database import SessionLocal, engine
+
+load_dotenv()
 from models import Base, Profile, Skill, Project
 from schemas import *
 from fastapi.middleware.cors import CORSMiddleware
@@ -12,7 +16,7 @@ from fastapi.middleware.cors import CORSMiddleware
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
-ADMIN_API_KEY = "zuheer123"   # simple on purpose (demo)
+ADMIN_API_KEY = os.getenv("ADMIN_API_KEY")
 def verify_admin(x_api_key: str = Header(None)):
     if x_api_key != ADMIN_API_KEY:
         raise HTTPException(status_code=401, detail="Unauthorized")
