@@ -44,9 +44,13 @@ llm = get_or_create_skill("LLM", "Beginner")
 
 
 # ================= PROJECTS =================
-title = "Sample Project"
-description = "This is a sample project description"
-link = "https://example.com"
+title = "TRAFFIC-SIGNAL-FORECASTING"
+description = "The Traffic Signal Forecasting System is an AI-powered solution designed to predict and optimize traffic light timings based on real-time and historical traffic data. The goal is to reduce congestion, improve traffic flow, and minimize waiting times at intersections. Using Python and Machine Learning algorithms."
+link = "https://github.com/mohamadzuheer6-gif/TRAFFIC-SIGNAL-FORECAST"
+
+title = "MEDICAL-CHATBOT-USING-LLM"
+description = "An AI-powered medical chatbot designed to provide 24/7 symptom analysis, triage, and reliable health information, bridging the gap between patients and primary care"
+link = "ttps://github.com/mohamadzuheer6-gif/MEDICAL-CHATBOT"
 
 project = Project(
     title=title,
