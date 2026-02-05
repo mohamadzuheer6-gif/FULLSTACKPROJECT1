@@ -1,40 +1,43 @@
+/* ================= API CONFIG ================= */
 const API = window.location.hostname.includes("localhost")
     ? "http://127.0.0.1:8000"
     : "https://fullstackproject1-mmf5.onrender.com";
 
 const ADMIN_KEY = "admin123";
 
+/* ================= AUTH ================= */
 function getAuthHeaders() {
     const key = sessionStorage.getItem("auth");
     if (!key) return {};
-    return {
-        "X-API-Key": key
-    };
-}
-function getAuthHeaders() {
-    const key = sessionStorage.getItem("auth");
-    if (!key) return {};
-    return {
-        "X-API-Key": key
-    };
+    return { "X-API-Key": key };
 }
 
-/* ---------- DOM REFERENCES ---------- */
-const profileView = document.getElementById("profileView");
-const skills = document.getElementById("skills");
-const projects = document.getElementById("projects");
+/* ================= DOM REFERENCES ================= */
+let profileView, skills, projects;
+let pName, pEmail, pEdu;
+let skillName, skillProf;
+let projTitle, projDesc, projLink;
 
-const pName = document.getElementById("pName");
-const pEmail = document.getElementById("pEmail");
-const pEdu = document.getElementById("pEdu");
+document.addEventListener("DOMContentLoaded", () => {
+    profileView = document.getElementById("profileView");
+    skills = document.getElementById("skills");
+    projects = document.getElementById("projects");
 
-const skillName = document.getElementById("skillName");
-const skillProf = document.getElementById("skillProf");
+    pName = document.getElementById("pName");
+    pEmail = document.getElementById("pEmail");
+    pEdu = document.getElementById("pEdu");
 
-const projTitle = document.getElementById("projTitle");
-const projDesc = document.getElementById("projDesc");
-const projLink = document.getElementById("projLink");
+    skillName = document.getElementById("skillName");
+    skillProf = document.getElementById("skillProf");
 
+    projTitle = document.getElementById("projTitle");
+    projDesc = document.getElementById("projDesc");
+    projLink = document.getElementById("projLink");
+
+    updateUI();
+});
+
+/* ================= LOGIN ================= */
 function login() {
     const key = prompt("Enter admin key:");
     if (key === ADMIN_KEY) {
@@ -58,21 +61,19 @@ function updateUI() {
     document.querySelectorAll(".edit-box").forEach(box => {
         box.style.display = loggedIn ? "block" : "none";
     });
-  // Logout button
+
     const logoutBtn = document.getElementById("logoutBtn");
-    if (logoutBtn) {
-        logoutBtn.style.display = loggedIn ? "inline-block" : "none";
-    }
+    if (logoutBtn) logoutBtn.style.display = loggedIn ? "inline-block" : "none";
+
     const badge = document.getElementById("adminBadge");
-    if (badge) {
-        badge.style.display = loggedIn ? "inline-block" : "none";
-    }
+    if (badge) badge.style.display = loggedIn ? "inline-block" : "none";
 }
 
-
-/* ---------- TOGGLE SECTION ---------- */
+/* ================= TOGGLE ================= */
 function toggleSection(id) {
     const el = document.getElementById(id);
+    if (!el) return false;
+
     if (el.style.display === "none" || el.style.display === "") {
         el.style.display = "block";
         return true;
@@ -82,14 +83,13 @@ function toggleSection(id) {
     }
 }
 
-/* ---------- PROFILE ---------- */
+/* ================= PROFILE ================= */
 function toggleProfile() {
+    if (!toggleSection("profileView")) return;
     loadProfile();
 }
 
 function loadProfile() {
-    if (!toggleSection("profileView")) return;
-
     fetch(`${API}/profile`)
         .then(r => r.json())
         .then(p => {
@@ -107,7 +107,10 @@ function loadProfile() {
 function saveProfile() {
     fetch(`${API}/profile`, {
         method: "PATCH",
-        headers: {"Content-Type":"application/json",...getAuthHeaders()},
+        headers: {
+            "Content-Type": "application/json",
+            ...getAuthHeaders()
+        },
         body: JSON.stringify({
             name: pName.value,
             email: pEmail.value,
@@ -116,14 +119,13 @@ function saveProfile() {
     }).then(() => loadProfile());
 }
 
-/* ---------- SKILLS ---------- */
+/* ================= SKILLS ================= */
 function toggleloadSkills() {
+    if (!toggleSection("skills")) return;
     loadSkills();
 }
 
 function loadSkills() {
-    if (!toggleSection("skills")) return;
-
     fetch(`${API}/skills`)
         .then(r => r.json())
         .then(data => {
@@ -165,7 +167,6 @@ function addSkill() {
     });
 }
 
-
 function deleteSkill(id) {
     fetch(`${API}/skills/${id}`, {
         method: "DELETE",
@@ -173,11 +174,8 @@ function deleteSkill(id) {
     }).then(() => loadSkills());
 }
 
-/* ---------- PROJECTS ---------- */
-/* ---------- PROJECTS ---------- */
-
+/* ================= PROJECTS ================= */
 function toggleloadProjects() {
-    // toggle FIRST, load ONLY when opened
     if (!toggleSection("projects")) return;
     loadProjects();
 }
@@ -187,31 +185,23 @@ function loadProjects() {
         .then(r => r.json())
         .then(data => {
             projects.innerHTML = "";
-
-            // SAFETY: ensure array
-            if (!Array.isArray(data)) {
-                console.error("Projects API did not return array", data);
-                return;
-            }
+            if (!Array.isArray(data)) return;
 
             data.forEach(p => {
                 projects.innerHTML += `
                     <div class="project">
                         <h3>${p.title}</h3>
                         <p>${p.description}</p>
-
                         ${
-                            p.links && p.links.link
-                            ? `<a href="${p.links.link}" target="_blank">🔗 Open</a><br>`
-                            : ""
+                            p.links?.link
+                                ? `<a href="${p.links.link}" target="_blank">🔗 Open</a><br>`
+                                : ""
                         }
-
                         <button onclick="deleteProject(${p.id})">Delete</button>
                     </div>
                 `;
             });
-        })
-        .catch(err => console.error("Load projects failed", err));
+        });
 }
 
 function addProject() {
@@ -226,8 +216,7 @@ function addProject() {
             description: projDesc.value.trim(),
             links: { link: projLink.value.trim() }
         })
-    })
-    .then(() => {
+    }).then(() => {
         projTitle.value = "";
         projDesc.value = "";
         projLink.value = "";
@@ -239,8 +228,5 @@ function deleteProject(id) {
     fetch(`${API}/projects/${id}`, {
         method: "DELETE",
         headers: { ...getAuthHeaders() }
-    })
-    .then(() => loadProjects());
+    }).then(() => loadProjects());
 }
-updateUI();
-
