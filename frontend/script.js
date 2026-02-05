@@ -240,6 +240,8 @@ function displayHardcodedProjects() {
         </div>
     `;
 }
+    `;
+}
 
 function addProject() {
     if (!projTitle.value || !projDesc.value || !projLink.value) {
